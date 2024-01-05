@@ -1,0 +1,543 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static "main.css" %}">
+    <link rel="stylesheet" href="{% static "form.css" %}">
+    <link rel="stylesheet" href="{% static "sidebar.css" %}">
+    <script src="https://kit.fontawesome.com/0ceeca1f1f.js" crossorigin="anonymous"></script>
+    <title>View</title>
+    <style>
+        #classwise_list{
+            display:none;
+        }
+        #student_details_form{
+            display:none;
+        }
+        #employee_details_form{
+            display:none;
+        }
+        .headings , #past_finance{
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-right: 30px;
+            font-size: 20px;
+          }
+        
+          table, th, td {
+            border: 1px solid rgb(0, 174, 173);
+          }
+        
+          th, td {
+            padding: 8px;
+            text-align: left;
+          }
+        
+          th {
+            background-color: rgba(0, 174, 173, 0.6);
+            color: #fff;
+            border: 1px solid #fff;
+          }
+        
+          tr:nth-child(even) {
+            {% comment %} background-color: rgba(0, 174, 173,0.3); {% endcomment %}
+            background-color:#fff;
+            color: rgb(0,174, 173);
+          }
+        
+          tr:nth-child(odd) {
+            background-color: #fff;
+            color: rgb(0, 174,173);
+          }
+          #finance_list{
+            display:none;
+          }
+          #fee_date,#expenditure_date{
+            display:none;
+          }
+          #fee,#expenditure{
+            cursor: pointer;
+          }
+          #message-container {
+            position: relative;
+            background: rgba(0,174,173,0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 50px auto;
+            overflow: hidden;
+            width: 30%;
+            box-shadow: 0px 0px 10px rgb(0,174,173);
+          }
+        
+          #loading-bar {
+            position: absolute;
+            bottom: 0;
+            left: 100%;
+            width: 100%;
+            height: 3px; 
+            background: rgb(0,174,173); 
+            z-index: 1;
+        }
+        
+        #message-content {
+            z-index: 2;
+        }
+        
+        .message {
+          padding: 10px;
+          border-radius: 10px;
+          background: rgba(0, 174, 173,0.6);
+          margin-bottom: 10px;
+          box-shadow: 0px 0px 10px #fff;
+          color: #fff;
+      }
+
+        #finance_list{
+          position: absolute;
+          top: 40%;
+          /* list-style-type: none; */
+          font-size: 18px;
+          line-height: 30px;
+          color: var(--secondary-color);
+          left: 20%;
+        }
+
+        #finance_list li{
+            margin-bottom: 10px;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        #finance_list li:hover{
+            color: #fff;
+        }
+
+        select{
+            height: 40px;
+            padding: 10px;
+            width: 60%;
+            border: 2px solid var(--secondary-color);
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+            color: var(--secondary-color);
+            font-size: 16px;
+        }
+
+        select:hover{
+            background-color: var(--secondary-color);
+            color: #fff;
+        }
+
+        #student_bio, #employee_bio{
+          width: 60%;
+        }
+        ::-webkit-scrollbar {
+          width: 10px;
+          background-color: rgb(217,243,243);
+      }
+      
+      ::-webkit-scrollbar-track-piece {
+          background-color: transparent;
+      }
+      
+      ::-webkit-scrollbar-corner {
+      }
+      
+      ::-webkit-scrollbar-track {
+      }
+      
+      ::-webkit-scrollbar-button {
+      }
+      
+      ::-webkit-scrollbar-thumb {
+          width: 5px;
+          background-color: rgb(51,190,189);
+           border-radius: 40px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+          width: 5px;
+      
+          background-color: rgb(217,243,243);
+          border-radius: 40px;
+      }
+    </style>
+</head>
+<body>
+  <div class="navbar1">
+    <div class="hamburger1" id="menus"><i class="fa-solid fa-bars"></i></div>
+    <div class="school_title">
+        <a href="{% url "index" %}"><h3 style="font-size: 32px;">CHAMP INTERNATIONAL SCHOOL</h3></a>
+    </div>
+    <div>
+      <a href="{% url "login" %}" class="login">
+        <div class="Login">
+          <i class="fa-solid fa-user"></i>
+        </div>
+    </a>
+  </div>
+  </div>
+
+  <div class="side-bar">
+    <div id="close"><i class="fa-solid fa-xmark"></i></div>
+    <ul>
+      <li><a href="{% url "index" %}">Home</a></li>
+      <li><a href="admission.html">Admission</a></li>
+      <li><a href="{% url "academics" %}">Academics</a></li>
+      <li><a href="{% url "life" %}">Student Life</a></li>
+      {% if user.is_authenticated %}
+        <li><a href="{% url "admin_interface" %}">Admin Operations</a></li>
+        <li><a href="{% url "logout" %}">Logout</a></li>
+        {% else %}
+        <li><a href="{% url "login" %}">Login</a></li>
+        {% endif %}
+    </ul>
+  </div>
+
+  <div class="side">
+    <ul>
+      <li class="headings" id='classwise_student_list'>ClassWise Students List</li>
+      <li class="headings" id='student_complete_details'>Student Particulars</li>
+      <li class="headings" id='employee_details'>Employee Particulars</li>
+      <li class="headings" id='past_finance'>Past Finance</li>
+    </ul>
+      <div id='finance_list'>
+        <li id='fee'>Fee Records</li>
+        <li id='expenditure'>Expenditures</li>
+      </div>
+    </div>
+
+    {% for msg in messages %}
+    <div id="message-container">
+        <div id="loading-bar"></div>
+        <div id="message-content">
+            
+                <div class="message">{{ msg }}</div>
+            
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="main">
+      <form action='/classwise_students/' method='post' id='classwise_list'>
+        {% csrf_token %}
+        <h4>Classwise List</h4>
+        <div class="single">
+          <label for="class" name="class">Class</label>
+          <select name="student_class">
+              <option value="" disabled selected>Select the Class</option>
+              <option value="nursery">Nursery</option>
+              <option value="pp-I">PP-I</option>
+              <option value="pp-II">PP-II</option>
+              <option value="I" >I</option>
+              <option value="II" >II</option>
+              <option value="III">III</option>
+              <option value="IV">IV</option>
+              <option value="V">V</option>
+              <option value="VI">VI</option>
+              <option value="VII">VII</option>
+              <option value="VIII">VIII</option>
+              <option value="IX">IX</option>
+              <option value="X">X</option>
+              <option value="XI">XI</option>
+              <option value="XII">XII</option>
+          </select>
+        </div>
+        <div class="single">
+          <label for="section" class="labels">Section</label>
+          <input type="text" name="section">
+        </div>
+        <button type='submit'>View List</button>
+      </form>
+
+      <form action="/get_student_details/" method="post" id="student_details_form">
+          {% csrf_token %}
+          <h4>Student Details Form</h4>
+          <div class="single">
+            <label for="adm_no">Enter Admission Number:</label>
+            <input type="text" name="adm_no" required>
+          </div>
+          <button type="submit" style="width: 200px;">Get Student Details</button>
+        </form>
+
+      <form method="post" action="/get_employee_details/" id='employee_details_form'>
+          {% csrf_token %}
+          <h4>Employee Details Form</h4>
+          <div class="single">
+            <label for="employee_id">Enter Employee ID:</label>
+            <input type="text" name="employee_id" required>
+          </div>
+          <button type="submit" style="width: 250px;">Get Employee Details</button>
+      </form>
+
+      <form action='/past_fee_records/' method='post' id='fee_date'>
+        {% csrf_token %}
+        <h4>Fee Date</h4>
+        <div class="single">
+          <label>Date</label>
+          <input type='date' name='date'>
+        </div>
+        <button type='submit' style="width: 200px;">View Fee Records</button>
+      </form>
+
+      <form action='/past_expenditure_records/' method='post' id='expenditure_date'>
+        {% csrf_token %}
+        <h4>Expenditure Date</h4>
+        <div class="single">
+          <label>Date</label>
+          <input type='date' name='date'>
+        </div>
+        <button type='submit' style="width: 200px;">View Expenses</button>
+      </form>
+
+  {% if list %}
+    <table id= "classwise_table">
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Section</th>
+            <th>Admission No</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Gender</th>
+            <th>Date of Birth</th>
+            <th>Aadhar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in list %}
+            <tr>
+              <td>{{ student.student_class }}</td>
+              <td>{{ student.section }}</td>
+              <td>{{ student.adm_no }}</td>
+              <td>{{ student.first_name }}</td>
+              <td>{{ student.last_name }}</td>
+              <td>{{ student.gender }}</td>
+              <td>{{ student.dob }}</td>
+              <td>{{ student.aadhar }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+    
+    
+  {% if student %}
+        <table id="student_bio">
+            <tr>
+            <th>Admission No</th>
+            <td>{{ student.adm_no }}</td>
+            </tr>
+            <tr>
+            <th>First Name</th>
+            <td>{{ student.first_name }}</td>
+            </tr>
+            <tr>
+                <th>Last Name</th>
+                <td>{{ student.last_name }}</td>
+              </tr>
+              <tr>
+                <th>Gender</th>
+                <td>{{ student.gender }}</td>
+              </tr>
+              <tr>
+                <th>Date of Birth</th>
+                <td>{{ student.dob }}</td>
+              </tr>
+              <tr>
+                <th>Aadhar</th>
+                <td>{{ student.aadhar }}</td>
+              </tr>
+              <tr>
+                <th>Class</th>
+                <td>{{ student.student_class }}</td>
+              </tr>
+              <tr>
+                <th>Section</th>
+                <td>{{ student.section }}</td>
+              </tr>
+              <tr>
+                <th>Mother Tongue</th>
+                <td>{{ student.mother_tongue }}</td>
+              </tr>
+              <tr>
+                <th>Father's Name</th>
+                <td>{{ student.father_name }}</td>
+              </tr>
+              <tr>
+                <th>Father's Occupation</th>
+                <td>{{ student.father_occupation }}</td>
+              </tr>
+              <tr>
+                <th>Mother's Name</th>
+                <td>{{ student.mother_name }}</td>
+              </tr>
+              <tr>
+                <th>Mother's Occupation</th>
+                <td>{{ student.mother_occupation }}</td>
+              </tr>
+              <tr>
+                <th>Contact</th>
+                <td>{{ student.contact }}</td>
+              </tr>
+              <tr>
+                <th>Address</th>
+                <td>{{ student.address }}</td>
+              </tr>
+        </table>
+
+     {% endif %}
+
+  {% if employee %}
+        <table id="employee_bio">
+            <tr>
+                <th>Employee ID</th>
+                <td>{{ employee.employee_id }}</td>
+            </tr>
+            <tr>
+                <th>First Name</th>
+                <td>{{ employee.first_name }}</td>
+            </tr>
+            <tr>
+                <th>Last Name</th>
+                <td>{{ employee.last_name }}</td>
+            </tr>
+            <tr>
+                <th>Qualification</th>
+                <td>{{ employee.qualification }}</td>
+            </tr>
+            <tr>
+                <th>Experience</th>
+                <td>{{ employee.experience }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ employee.email }}</td>
+            </tr>
+            <tr>
+                <th>Contact</th>
+                <td>{{ employee.contact }}</td>
+            </tr>
+            <tr>
+                <th>Work Type</th>
+                <td>{{ employee.work_type }}</td>
+            </tr>
+            <tr>
+                <th>Working Hours</th>
+                <td>{{ employee.working_hours }}</td>
+            </tr>
+            <tr>
+                <th>Subject ID</th>
+                <td>{{ employee.subject_id }}</td>
+            </tr>
+            <tr>
+                <th>Subject</th>
+                <td>{{ employee.subject }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ employee.role }}</td>
+            </tr>
+            <tr>
+                <th>Account No</th>
+                <td>{{ employee.account_no }}</td>
+            </tr>
+            <tr>
+                <th>Bank</th>
+                <td>{{ employee.bank }}</td>
+            </tr>
+            <tr>
+                <th>IFSC Code</th>
+                <td>{{ employee.ifsc_code }}</td>
+            </tr>
+            <tr>
+                <th>Salary</th>
+                <td>{{ employee.salary }}</td>
+            </tr>
+        </table>
+        {% endif %}
+
+   
+ {% if fee_record %}
+    <table id="fee_record_table">
+      <thead>
+          <tr>
+              <th>Receipt No</th>
+              <th>Date</th>
+              <th>Admission No</th>
+              <th>Student Name</th>
+              <th>Student Class</th>
+              <th>Section</th>
+              <th>Fee Paid</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for record in fee_record %}
+          <tr>
+              <td>{{ record.receipt_no }}</td>
+              <td>{{ record.date }}</td>
+              <td>{{ record.adm_no.adm_no }}</td>
+              <td>{{ record.student_name }}</td>
+              <td>{{ record.student_class }}</td>
+              <td>{{ record.section }}</td>
+              <td>{{ record.fee_paid }}</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+  {% endif %}
+
+    
+ {% if expenditure_record %}
+    <table id="exp_record_table">
+      <thead>
+          <tr>
+              <th>Date</th>
+              <th>Purpose</th>
+              <th>Amount</th>
+          </tr>
+      </thead>
+      <tbody>
+              {% for record in expenditure_record %}
+                  <tr>
+                      <td>{{ record.date }}</td>
+                      <td>{{ record.purpose }}</td>
+                      <td>{{ record.amount }}</td>
+                  </tr>
+              {% endfor %}
+      </tbody>
+  </table>
+  {% endif %}
+  </div>
+
+  <footer>
+    <div class="footer">
+      <div class="info">
+        <h4>Champ International School</h4>
+      </div>
+      <div class="social">
+        <ul>
+          <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
+          <li><a href="#"><i class="fa-brands fa-linkedin"></i></a></li>
+          <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
+          <li><a href="#"><i class="fa-brands fa-facebook"></i></a></li>
+        </ul>
+      </div>
+      <div class="rights">
+        <p><i class="fa-solid fa-copyright"></i> Copyrights reserved.</p>
+      </div>
+    </div>
+    
+  </footer>
+
+
+  <script src="{% static "view.js" %}"></script>
+</body>
+</html>
