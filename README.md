@@ -4,8 +4,7 @@ A User friendly end to end Admin interface with login authentication to enroll,m
 The prime intuition in developing the website is to provide an attractive and a quite handy interface for the school admin employees to work with the data which they deal with in their day to day operations.
 
 #### Run the project in local environment 
-Clone the github repository through the following command : ``` git clone 
-https://github.com/bgvshiva2004/School_Admin_System.git ```
+Clone the github repository through the following command : ``` git clone https://github.com/Madan-2004/SchoolDBMS.git```
 
 * After cloning the repository into the local environment, make sure to change the MySQL database' USER and Password Credentials to the respective MySQL workbench credentials. 
 
